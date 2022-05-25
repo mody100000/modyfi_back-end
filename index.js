@@ -42,28 +42,25 @@ app.post("/api/products/insert", (req, res, next) => {
     stock: req.body.stock,
     price: req.body.price,
     genre_id: req.body.genre_id,
+    img_name: filename,
   };
-  const q = `INSERT INTO products (name , description , stock , price , genre_id , added_by) VALUES ("${data.name}" , "${data.description}" , ${data.stock} , ${data.price} , ${data.genre_id} , 1)`;
+  const q = `INSERT INTO products (name , description , stock , price , genre_id , added_by ,img_name) VALUES ("${data.name}" , "${data.description}" , ${data.stock} , ${data.price} , ${data.genre_id} , 1 , "${data.img_name}")`;
 
   connection.query(q, (err, results) => {
     if (err) {
       return next(err);
     }
-    connection.query(
-      `insert into product_images (product_id , name) VALUES(${results.insertId} , '${filename}')`,
-      (_err, _results) => {
-        if (_err) return next(_err);
 
-        file.mv(`${newpath}${filename}`, (err) => {
-          if (err) {
-            return res
-              .status(500)
-              .send({ message: "File upload failed", code: 200 });
-          }
-          return res.status(200).send({ message: "File Uploaded", code: 200 });
-        });
+    file.mv(`${newpath}${filename}`, (err) => {
+      if (err) {
+        return res
+          .status(500)
+          .send({ message: "File upload failed", code: 200 });
       }
-    );
+      return res
+        .status(200)
+        .send({ message: "product is inserted", code: 200 });
+    });
   });
 });
 
